@@ -16,9 +16,13 @@ document.getElementById('uploadBtn').addEventListener('click', async () => {
 
     if (!res.ok) throw new Error('アップロード失敗');
 
-    const blob = await res.blob();
-    const url = URL.createObjectURL(blob);
-    document.getElementById('preview').src = url;
+    const data = await res.json();
+
+    // メタデータ
+    console.log('Metadata:', data.metadata);
+
+    // 画像表示
+    document.getElementById('preview').src = data.imageUrl;
   } catch (err) {
     console.error(err);
     alert('エラーが発生しました');

@@ -1,3 +1,4 @@
+// image.controller.ts
 import { Request, Response } from 'express';
 import { processImage } from '../services/image.service.js';
 import { extractMetadata } from '../services/metadata.service.js';
@@ -10,16 +11,18 @@ export const uploadImage = async (req: Request, res: Response) => {
 
     // Step 1. metadata解析
     const metadata = await extractMetadata(req.file.buffer);
-    console.log('Metadata:', metadata);
 
     // Step 2. 画像加工
     const processedImage = await processImage(req.file.buffer);
 
-    // 画像とmetadata両方返す
-    res.set('Content-Type', 'application/json');
-    res.send({
+    // Step 3. レスポンス（JSON + 画像URL風）
+    // 一旦メモリに保存した画像を `/tmp` 的な場所に出してURL返すイメージ
+    const imageBase64 = processedImage.toString('base64');
+    const imageSrc = `data:image/webp;base64,${imageBase64}`;
+
+    res.json({
       metadata,
-      image: processedImage,
+      imageUrl: imageSrc,
     });
   } catch (err) {
     console.error(err);
